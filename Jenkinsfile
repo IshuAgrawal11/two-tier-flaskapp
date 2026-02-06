@@ -1,48 +1,39 @@
-@Library("Shared") _
-pipeline{
-    
-    agent { label "dev"};
-    
-    stages{
-        stage("Code Clone"){
-            steps{
-               script{
-                   clone("https://github.com/LondheShubham153/two-tier-flask-app.git", "master")
-               }
+pipeline {
+    agent any 
+
+    stages {
+        stage("Code") {
+            steps {
+                git url: "https://github.com/IshuAgrawal11/two-tier-flaskapp.git", branch: "main"
             }
         }
-        stage("Trivy File System Scan"){
-            steps{
-                script{
-                    trivy_fs()
+        stage("Build") {
+            steps {
+                sh "docker build -t my-app ."
+            }
+        }
+        stage("Push to Docker Hub") {
+            steps {
+                // Fixed comma and case sensitivity here
+                withCredentials([usernamePassword(
+                    credentialsId: "Docker-Hub-creds",
+                    passwordVariable: "dockerHubPass",
+                    usernameVariable: "dockerHubUser"
+                )]) {
+                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
+                    sh "docker image tag my-app ${env.dockerHubUser}/my-app:latest"
+                    sh "docker push ${env.dockerHubUser}/my-app:latest"
                 }
             }
         }
-        stage("Build"){
-            steps{
-                sh "docker build -t two-tier-flask-app ."
-            }
-            
-        }
-        stage("Test"){
-            steps{
-                echo "Developer / Tester tests likh ke dega..."
-            }
-            
-        }
-        stage("Push to Docker Hub"){
-            steps{
-                script{
-                    docker_push("dockerHubCreds","two-tier-flask-app")
-                }  
-            }
-        }
-        stage("Deploy"){
-            steps{
-                sh "docker compose up -d --build flask-app"
+        stage("Deploy") {
+            steps {
+                // Removed --build to use the image we just pushed/tagged
+                sh "docker compose up -d"
             }
         }
     }
+}
 
 post{
         success{
