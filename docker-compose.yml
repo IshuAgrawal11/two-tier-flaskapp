@@ -11,7 +11,7 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     volumes:
-      - ./mysql-data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
       - ./message.sql:/docker-entrypoint-initdb.d/message.sql  
     networks:
       - twotier
@@ -46,6 +46,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+volumes:
+  mysql_data:
 
 networks:
   twotier:
