@@ -1,5 +1,5 @@
 pipeline {
-    agent {label "dev"};
+    agent { label "dev" } 
 
     stages {
         stage("Code") {
@@ -22,6 +22,7 @@ pipeline {
                     sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
                     sh "docker image tag my-app ${env.dockerHubUser}/my-app:latest"
                     sh "docker push ${env.dockerHubUser}/my-app:latest"
+                    sh "docker logout" // Security best practice
                 }
             }
         }
@@ -30,20 +31,20 @@ pipeline {
                 sh "docker compose up -d"
             }
         }
-    } // End of stages
+    } 
 
     post {
         success {
             emailext from: 'ishuagrawal1103@gmail.com',
                      to: 'ishuagrawal1103@gmail.com',
-                     body: 'Build success for Demo CICD App',
+                     body: "Build success for Demo CICD App - Job #${env.BUILD_NUMBER}",
                      subject: 'Build success for Demo CICD App'
-        }
+        } // Added missing brace
         failure {
             emailext from: 'ishuagrawal1103@gmail.com',
                      to: 'ishuagrawal1103@gmail.com',
-                     body: 'Build Failed for Demo CICD App',
+                     body: "Build Failed for Demo CICD App - Check logs at ${env.BUILD_URL}",
                      subject: 'Build Failed for Demo CICD App'
-        }
+        } // Added missing brace
     }
-} // End of pipeline
+}
