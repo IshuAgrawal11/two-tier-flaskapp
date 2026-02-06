@@ -14,7 +14,6 @@ pipeline {
         }
         stage("Push to Docker Hub") {
             steps {
-                // Fixed comma and case sensitivity here
                 withCredentials([usernamePassword(
                     credentialsId: "Docker-Hub-creds",
                     passwordVariable: "dockerHubPass",
@@ -28,29 +27,23 @@ pipeline {
         }
         stage("Deploy") {
             steps {
-                // Removed --build to use the image we just pushed/tagged
                 sh "docker compose up -d"
             }
         }
-    }
-}
+    } // End of stages
 
-post{
-        success{
-            script{
-                emailext from: 'mentor@trainwithshubham.com',
-                to: 'mentor@trainwithshubham.com',
-                body: 'Build success for Demo CICD App',
-                subject: 'Build success for Demo CICD App'
-            }
+    post {
+        success {
+            emailext from: 'ishuagrawal1103@gmail.com',
+                     to: 'ishuagrawal1103@gmail.com',
+                     body: 'Build success for Demo CICD App',
+                     subject: 'Build success for Demo CICD App'
         }
-        failure{
-            script{
-                emailext from: 'mentor@trainwithshubham.com',
-                to: 'mentor@trainwithshubham.com',
-                body: 'Build Failed for Demo CICD App',
-                subject: 'Build Failed for Demo CICD App'
-            }
+        failure {
+            emailext from: 'ishuagrawal1103@gmail.com',
+                     to: 'ishuagrawal1103@gmail.com',
+                     body: 'Build Failed for Demo CICD App',
+                     subject: 'Build Failed for Demo CICD App'
         }
     }
-}
+} // End of pipeline
