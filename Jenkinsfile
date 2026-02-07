@@ -37,7 +37,7 @@ pipeline {
         success {
             emailext from: 'ishuagrawal1103@gmail.com',
                      to: 'ishuagrawal1103@gmail.com',
-                     body: "Build success for Demo CICD App - Job #${env.BUILD_NUMBER}",
+                     body: "Build success for Demo CICD App - Job ${env.BUILD_NUMBER}",
                      subject: 'Build success for Demo CICD App'
         } // Added missing brace
         failure {
